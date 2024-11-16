@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pe-wa-pvc
+  name: smplcal-pvc
 spec:
   accessModes:
     - ReadWriteOnce
