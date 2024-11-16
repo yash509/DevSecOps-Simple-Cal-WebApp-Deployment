@@ -29,7 +29,7 @@ pipeline {
         
         stage('Checkout from Git') {                        
             steps {                                       
-                git branch: 'main', url: 'https://github.com/yash509/DevSecOps-Bsc-Bkgrnd-Gnrtr-Deployment.git'
+                git branch: 'main', url: 'https://github.com/yash509/DevSecOps-Simple-Cal-WebApp-Deployment.git'
             }
         }
         
@@ -160,7 +160,7 @@ pipeline {
                 script{
                     //dir('Band Website') {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                            sh "docker build -t bsc-bkgrnd ." 
+                            sh "docker build -t smplcal ." 
                             
                         //}
                     }
@@ -173,7 +173,7 @@ pipeline {
                 script{
                     //dir('Band Website') {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                            sh "docker tag bsc-bkgrnd yash5090/bsc-bkgrnd:latest " 
+                            sh "docker tag smplcal yash5090/smplcal:latest " 
                         //}
                     }
                 }
@@ -182,7 +182,7 @@ pipeline {
         
         stage('Docker Image Scanning') { 
             steps { 
-                sh "trivy image --format table -o trivy-image-report.html yash5090/bsc-bkgrnd:latest" 
+                sh "trivy image --format table -o trivy-image-report.html yash5090/smplcal:latest" 
             } 
         } 
         
@@ -191,7 +191,7 @@ pipeline {
                 script{
                     //dir('Band Website') {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                            sh "docker push yash5090/bsc-bkgrnd:latest "
+                            sh "docker push yash5090/smplcal:latest "
                         //}
                     }
                 }
@@ -202,10 +202,10 @@ pipeline {
             steps {
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh 'docker-scout quickview yash5090/bsc-bkgrnd:latest'
-                       sh 'docker-scout cves yash5090/bsc-bkgrnd:latest'
-                       sh 'docker-scout recommendations yash5090/bsc-bkgrnd:latest'
-                       sh 'docker-scout attestation yash5090/bsc-bkgrnd:latest'
+                       sh 'docker-scout quickview yash5090/smplcal:latest'
+                       sh 'docker-scout cves yash5090/smplcal:latest'
+                       sh 'docker-scout recommendations yash5090/smplcal:latest'
+                       sh 'docker-scout attestation yash5090/smplcal:latest'
                    }
                 }   
             }
@@ -215,8 +215,8 @@ pipeline {
 		steps {
                 withCredentials([string(credentialsId: 'snyk', variable: 'snyk')]) {
                    sh 'snyk auth $snyk'
-                   sh 'snyk container test yash5090/bsc-bkgrnd:latest > snyk-containertest-vulnerabilityreport.txt --report || true '
-                   sh 'snyk container monitor yash5090/bsc-bkgrnd:latest > snyk-containermonitor-vulnerabilityreport.txt || true'
+                   sh 'snyk container test yash5090/smplcal:latest > snyk-containertest-vulnerabilityreport.txt --report || true '
+                   sh 'snyk container monitor yash5090/smplcal:latest > snyk-containermonitor-vulnerabilityreport.txt || true'
                 }
             }
         }    
@@ -224,15 +224,15 @@ pipeline {
         stage("TRIVY"){
             steps{
                 //dir('Band Website') {
-                    sh "trivy image yash5090/bsc-bkgrnd:latest > trivyimage.txt"   
+                    sh "trivy image yash5090/smplcal:latest > trivyimage.txt"   
                 //}
             }
         }
 		
 		stage("Anchore Grype Docker Image Vulnerability Scan"){
             steps{
-                sh "docker run --rm anchore/grype:v0.82.0 yash5090/bsc-bkgrnd:latest"
-                sh "docker run --rm anchore/grype:v0.82.0 -o json yash5090/bsc-bkgrnd:latest > grypescanreport.json"
+                sh "docker run --rm anchore/grype:v0.82.0 yash5090/smplcal:latest"
+                sh "docker run --rm anchore/grype:v0.82.0 -o json yash5090/smplcal:latest > grypescanreport.json"
             }
         }
         
@@ -240,7 +240,7 @@ pipeline {
             steps {
                 script{
                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                      sh 'docker-scout sbom --format list yash5090/bsc-bkgrnd:latest' // docker-scout sbom yash5090/bsc-bkgrnd:latest
+                      sh 'docker-scout sbom --format list yash5090/smplcal:latest' // docker-scout sbom yash5090/smplcal:latest
                     }
                 }   
             }
@@ -274,15 +274,15 @@ pipeline {
 
         stage ("Remove Docker Container") {
             steps{
-                sh "docker stop bsc-bkgrnd | true"
-                sh "docker rm bsc-bkgrnd | true"
+                sh "docker stop smplcal | true"
+                sh "docker rm smplcal | true"
              }
         }
         
         stage('Deploy to Docker Container'){
             steps{
                 //dir('BMI Calculator (JS)') {
-                    sh 'docker run -d --name bsc-bkgrnd -p 5000:80 yash5090/bsc-bkgrnd:latest' 
+                    sh 'docker run -d --name smplcal -p 5000:80 yash5090/smplcal:latest' 
                 //}
             }
         }
